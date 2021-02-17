@@ -5,7 +5,7 @@ import numpy as np
 from scipy.special import digamma, polygamma
 
 
-def simulation_data2(D=500, k=10, V=1000, xi=40, max_iter=100, gamma_shape=2, gamma_scale=1):
+def simulation_data(D=500, k=10, V=1000, xi=40, max_iter=100, gamma_shape=2, gamma_scale=1):
     """Simulation the data according to LDA process. Return a list
     of N_d*V matrix(one-hot-coding) with length M.
     --------------------------------------------------------------
@@ -17,10 +17,15 @@ def simulation_data2(D=500, k=10, V=1000, xi=40, max_iter=100, gamma_shape=2, ga
     the parameter gamma_shape,gamma_scale for gamma distribution (generate the alpha in the paper);
     ---------------------------------------------------------------
     Output:
-    docs: documents. a length M list of Nd*V matrix (one-hot-coding),
-    alpha: concentrate parameters for dirichlet distribution, k*1 vector,
-    BETA: k*V matrix.
 
+    images: vectorized images. a length N list of Nd*5 matrix, with each line to be a vector of a image region,
+    captions: word documents. a length M list of Md*V matrix (one-hot-coding),
+    alpha : concentrate parameters for dirichlet distribution, k*1 vector,
+    BETA: k*V matrix.
+    Mean: k*5 matrix.
+    Covariance: k*5 matrix
+
+    ** Assume that the length of vector of a image region is 5.
     """
 
     images = []
@@ -203,5 +208,5 @@ def mmse(alpha, BETA, alpha_est, BETA_est):
 # print(a)
 
 
-# images, captions, alpha, BETA, Mean, Covariance = simulation_data2()
+# images, captions, alpha, BETA, Mean, Covariance = simulation_data()
 # print()
