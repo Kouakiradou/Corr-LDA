@@ -1,10 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="ChangeListManager">
-    <list default="true" id="ceb4527c-f354-425b-b1e2-4adf958f7c7a" name="Default Changelist" comment="">
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/corr-LDA.py" beforeDir="false" afterPath="$PROJECT_DIR$/corr-LDA.py" afterDir="false" />
-    </list>
+    <list default="true" id="ceb4527c-f354-425b-b1e2-4adf958f7c7a" name="Default Changelist" comment="" />
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -110,7 +107,7 @@
       <workItem from="1613403463445" duration="327000" />
       <workItem from="1613404089210" duration="1966000" />
       <workItem from="1613457325571" duration="22000" />
-      <workItem from="1613457373169" duration="29985000" />
+      <workItem from="1613457373169" duration="30663000" />
     </task>
     <servers />
   </component>
