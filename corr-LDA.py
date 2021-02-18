@@ -61,7 +61,7 @@ def simulation_data(D=500, k=10, V=1000, xi=40, max_iter=100, gamma_shape=2, gam
     return images, captions, alpha, BETA, Mean, Covariance
 
 
-def E_step_Vectorization(alpha, BETA, Mean, Covariance, image, caption, Phi0, gamma0, lambda0, max_iter=100, tol=1e-3):
+def E_step_Vectorization(alpha, BETA, Mean, Covariance, image, caption, Phi0, gamma0, Lambda0, max_iter=100, tol=1e-3):
     """
     Vectorization Version Latent Dirichlet Allocation: E-step.
     Do to a specific document.
@@ -75,7 +75,7 @@ def E_step_Vectorization(alpha, BETA, Mean, Covariance, image, caption, Phi0, ga
     captions as a Md*V matrix
     Phi0 as a Nd*k matrix;
     gamma0 as a k*1 vector;
-    lambda0 is a Md*N matrix;
+    Lambda0 is a Md*N matrix;
     tol as a float: tolerance.
     -------------------------------------
     Output:
@@ -85,10 +85,10 @@ def E_step_Vectorization(alpha, BETA, Mean, Covariance, image, caption, Phi0, ga
     # Initialization
     Phi = Phi0
     gamma = gamma0
-    lambdaa = lambda0
+    Lambdaa = Lambda0
     phi_delta = 1
     gamma_delta = 1
-    lambdaa_delta = 1
+    Lambdaa_delta = 1
 
     # relative tolerance is for each element in the matrix
     tol = tol ** 2
@@ -103,12 +103,12 @@ def E_step_Vectorization(alpha, BETA, Mean, Covariance, image, caption, Phi0, ga
             multivari_pdf[:, k] = temp_pdf
 
         ##update Phi
-        Phi = multivari_pdf * np.exp(digamma(gamma) - digamma(sum(gamma))) * np.exp(lambdaa.T @ (caption @ BETA.T)) #please double check
+        Phi = multivari_pdf * np.exp(digamma(gamma) - digamma(sum(gamma))) * np.exp(Lambdaa.T @ (caption @ BETA.T)) #please double check
         Phi = Phi / (Phi.sum(axis=1)[:, None])  # row sum to 1
 
-        ##update lambda
-        lambdaa = np.exp((caption @ BETA.T) @ Phi.T)
-        lambdaa = lambdaa / (lambdaa.sum(axis=1)[:, None])
+        ##update Lambda
+        Lambdaa = np.exp((caption @ BETA.T) @ Phi.T)
+        Lambdaa = Lambdaa / (Lambdaa.sum(axis=1)[:, None])
 
         # Phi = (doc @ BETA.T) * np.exp(digamma(gamma) - digamma(sum(gamma)))
         # Phi = Phi / (Phi.sum(axis=1)[:, None])  # row sum to 1
@@ -119,20 +119,20 @@ def E_step_Vectorization(alpha, BETA, Mean, Covariance, image, caption, Phi0, ga
         ##check the convergence
         phi_delta = np.mean((Phi - Phi0) ** 2)
         gamma_delta = np.mean((gamma - gamma0) ** 2)
-        lambdaa_delta = np.mean((lambdaa - lambda0) ** 2)
+        Lambdaa_delta = np.mean((Lambdaa - Lambda0) ** 2)
 
         ##refill
         Phi0 = Phi
         gamma0 = gamma
-        lambda0 = lambdaa
+        Lambda0 = Lambdaa
 
-        if (phi_delta <= tol) and (gamma_delta <= tol) and (lambdaa_delta <= tol):
+        if (phi_delta <= tol) and (gamma_delta <= tol) and (Lambdaa_delta <= tol):
             break
 
-    return Phi, gamma, lambdaa
+    return Phi, gamma, Lambdaa
 
 
-def M_step_Vectorization(docs, k, tol=1e-3, tol_estep=1e-3, max_iter=100, initial_alpha_shape=100,
+def M_step_Vectorization(images, captions, k, tol=1e-3, tol_estep=1e-3, max_iter=100, initial_alpha_shape=100,
                          initial_alpha_scale=0.01):
     """
     Vectorization version VI EM for Latent Dirichlet Allocation: M-step.
@@ -153,15 +153,20 @@ def M_step_Vectorization(docs, k, tol=1e-3, tol_estep=1e-3, max_iter=100, initia
     """
 
     # get basic iteration
-    M = len(docs)
-    V = docs[1].shape[1]
-    N = [doc.shape[0] for doc in docs]
+    D = len(images)
+    V = captions[1].shape[1]
+    N = [image.shape[0] for image in images]
+    M = [caption.shape[0] for caption in captions]
+
 
     # initialization
     BETA0 = np.random.dirichlet(np.ones(V), k)
     alpha0 = np.random.gamma(shape=initial_alpha_shape, scale=initial_alpha_scale, size=k)
-    PHI = [np.ones((N[d], k)) / k for d in range(M)]
-    GAMMA = np.array([alpha0 + N[d] / k for d in range(M)])
+    Mean0 = np.random.normal(0, 1, (k, 5))
+    Covariance0 = np.random.normal(1, 1, (k, 5))
+    PHI = [np.ones((N[d], k)) / k for d in range(D)]
+    LAMBDA = [np.ones((M[d], N[d])) / N[d] for d in range(D)]
+    GAMMA = np.array([alpha0 + N[d] / k for d in range(D)]) #?? why use N[d] but bot M[d]
 
     BETA = BETA0
     alpha = alpha0
@@ -174,16 +179,16 @@ def M_step_Vectorization(docs, k, tol=1e-3, tol_estep=1e-3, max_iter=100, initia
 
         # update PHI,GAMMA,BETA
         BETA = np.zeros((k, V))
-        for d in range(M):  # documents
-            PHI[d], GAMMA[d,] = E_step_Vectorization(alpha0, BETA0, docs[d], PHI[d], GAMMA[d,], max_iter, tol_estep)
+        for d in range(D):  # documents
+            PHI[d], GAMMA[d,], LAMBDA[d] = E_step_Vectorization(alpha0, BETA0, Mean0, Covariance0, images[d], captions[d], PHI[d], GAMMA[d,], LAMBDA[d], max_iter, tol_estep)
             BETA += PHI[d].T @ docs[d]
         BETA = BETA / (BETA.sum(axis=1)[:, None])  # rowsum=1
 
         # update alpha
 
-        z = M * polygamma(1, sum(alpha0))
-        h = -M * polygamma(1, alpha0)
-        g = M * (digamma(sum(alpha0)) - digamma(alpha0)) + (digamma(GAMMA) - digamma(GAMMA.sum(axis=1))[:, None]).sum(
+        z = D * polygamma(1, sum(alpha0))
+        h = -D * polygamma(1, alpha0)
+        g = D * (digamma(sum(alpha0)) - digamma(alpha0)) + (digamma(GAMMA) - digamma(GAMMA.sum(axis=1))[:, None]).sum(
             axis=0)
         c = (sum(g / h)) / (1 / z + sum(1 / h))
         alpha = alpha0 - (g - c) / h
