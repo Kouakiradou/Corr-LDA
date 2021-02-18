@@ -181,7 +181,7 @@ def M_step_Vectorization(images, captions, k, tol=1e-3, tol_estep=1e-3, max_iter
         BETA = np.zeros((k, V))
         for d in range(D):  # documents
             PHI[d], GAMMA[d,], LAMBDA[d] = E_step_Vectorization(alpha0, BETA0, Mean0, Covariance0, images[d], captions[d], PHI[d], GAMMA[d,], LAMBDA[d], max_iter, tol_estep)
-            BETA += PHI[d].T @ docs[d]
+            BETA += (LAMBDA[d] @ PHI[d]).T @ captions[d]
         BETA = BETA / (BETA.sum(axis=1)[:, None])  # rowsum=1
 
         # update alpha
