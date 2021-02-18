@@ -3,6 +3,7 @@
 
 import numpy as np
 from scipy.special import digamma, polygamma
+from scipy.stats import multivariate_normal
 
 
 def simulation_data(D=500, k=10, V=1000, xi=40, max_iter=100, gamma_shape=2, gamma_scale=1):
@@ -10,7 +11,7 @@ def simulation_data(D=500, k=10, V=1000, xi=40, max_iter=100, gamma_shape=2, gam
     of N_d*V matrix(one-hot-coding) with length M.
     --------------------------------------------------------------
     Input:
-    number of documents M,
+    number of documents D,
     number of topics k,
     number of vocabulary V,
     the parameter xi for possion distribution xi (generate the length of each document),
@@ -42,8 +43,6 @@ def simulation_data(D=500, k=10, V=1000, xi=40, max_iter=100, gamma_shape=2, gam
     M = np.random.poisson(lam=(xi - 1), size=D) + 1  # number of words of captions in the image
     THETA = np.random.dirichlet(alpha, D)
 
-
-
     for d in range(D):
         Z = np.random.multinomial(1, THETA[d,], N[d])
         Y = np.random.randint(0, N[d], M[d])
@@ -53,7 +52,7 @@ def simulation_data(D=500, k=10, V=1000, xi=40, max_iter=100, gamma_shape=2, gam
         W = np.zeros((M[d], V))
         for n in range(N[d]):
             covar_mat = np.diag(temp_covar[n,])
-            R[n, ] = np.random.multivariate_normal(temp_mean[n,], covar_mat)
+            R[n,] = np.random.multivariate_normal(temp_mean[n,], covar_mat)
         images.append(R)
         for m in range(M[d]):
             temp_BETA = Z[Y[m]] @ BETA  # we can actually manipulate the matrix in one step, fix it in the future
@@ -62,7 +61,7 @@ def simulation_data(D=500, k=10, V=1000, xi=40, max_iter=100, gamma_shape=2, gam
     return images, captions, alpha, BETA, Mean, Covariance
 
 
-def E_step_Vectorization(alpha, BETA, doc, Phi0, gamma0, max_iter=100, tol=1e-3):
+def E_step_Vectorization(alpha, BETA, Mean, Covariance, image, caption, Phi0, gamma0, lambda0, max_iter=100, tol=1e-3):
     """
     Vectorization Version Latent Dirichlet Allocation: E-step.
     Do to a specific document.
@@ -70,9 +69,13 @@ def E_step_Vectorization(alpha, BETA, doc, Phi0, gamma0, max_iter=100, tol=1e-3)
     Input:
     alpha as a k*1 vector;
     BETA as a k*V matrix;
-    doc as a Nd*V matrix;
+    Mean as a k*5 matrix.
+    Covariance as a k*5 matrix
+    image as a Nd*5 matrix;
+    captions as a Md*V matrix
     Phi0 as a Nd*k matrix;
     gamma0 as a k*1 vector;
+    lambda0 is a Md*N matrix;
     tol as a float: tolerance.
     -------------------------------------
     Output:
@@ -82,32 +85,51 @@ def E_step_Vectorization(alpha, BETA, doc, Phi0, gamma0, max_iter=100, tol=1e-3)
     # Initialization
     Phi = Phi0
     gamma = gamma0
+    lambdaa = lambda0
     phi_delta = 1
     gamma_delta = 1
+    lambdaa_delta = 1
 
     # relative tolerance is for each element in the matrix
     tol = tol ** 2
 
     for iteration in range(max_iter):
-        ##update Phi
-        Phi = (doc @ BETA.T) * np.exp(digamma(gamma) - digamma(sum(gamma)))
-        Phi = Phi / (Phi.sum(axis=1)[:, None])  # row sum to 1
-
         ##update gamma
         gamma = alpha + Phi.sum(axis=0)
+
+        multivari_pdf = np.zeros((image.shape[0], Mean.shape[0]))  # not sure if I should use pdf, since it is contineous
+        for k in range(Mean.shape[0]):
+            temp_pdf = multivariate_normal(mean=Mean[k], cov=np.diag(Covariance[k,])).pdf(image)  # Nd*1
+            multivari_pdf[:, k] = temp_pdf
+
+        ##update Phi
+        Phi = multivari_pdf * np.exp(digamma(gamma) - digamma(sum(gamma))) * np.exp(lambdaa.T @ (caption @ BETA.T)) #please double check
+        Phi = Phi / (Phi.sum(axis=1)[:, None])  # row sum to 1
+
+        ##update lambda
+        lambdaa = np.exp((caption @ BETA.T) @ Phi.T)
+        lambdaa = lambdaa / (lambdaa.sum(axis=1)[:, None])
+
+        # Phi = (doc @ BETA.T) * np.exp(digamma(gamma) - digamma(sum(gamma)))
+        # Phi = Phi / (Phi.sum(axis=1)[:, None])  # row sum to 1
+
+        # ##update gamma
+        # gamma = alpha + Phi.sum(axis=0)
 
         ##check the convergence
         phi_delta = np.mean((Phi - Phi0) ** 2)
         gamma_delta = np.mean((gamma - gamma0) ** 2)
+        lambdaa_delta = np.mean((lambdaa - lambda0) ** 2)
 
         ##refill
         Phi0 = Phi
         gamma0 = gamma
+        lambda0 = lambdaa
 
-        if ((phi_delta <= tol) and (gamma_delta <= tol)):
+        if (phi_delta <= tol) and (gamma_delta <= tol) and (lambdaa_delta <= tol):
             break
 
-    return Phi, gamma
+    return Phi, gamma, lambdaa
 
 
 def M_step_Vectorization(docs, k, tol=1e-3, tol_estep=1e-3, max_iter=100, initial_alpha_shape=100,
@@ -201,7 +223,12 @@ def mmse(alpha, BETA, alpha_est, BETA_est):
 # alpha_mse, beta_mse = mmse(alpha, BETA, alpha_est, beta_est)
 # print(alpha_mse, beta_mse)
 
+
 # covar_mat = np.diag([1,1,1,1,1])
+# a = multivariate_normal(mean=[0,0,0,0,0], cov=covar_mat).pdf([[0,0,0,0,0],[1,1,1,1,1]])
+# print(a)
+
+
 # a = np.random.multivariate_normal([0,0,0,0,0], covar_mat)
 # print(a)
 # a = np.random.randint(0, 100, 10)
@@ -210,3 +237,16 @@ def mmse(alpha, BETA, alpha_est, BETA_est):
 
 # images, captions, alpha, BETA, Mean, Covariance = simulation_data()
 # print()
+# gamma = [1,2,3,4]
+# a = digamma(gamma) - digamma(sum(gamma))
+# print(digamma(gamma))
+# print(digamma(sum(gamma)))
+# print(a)
+# print(np.exp(a))
+
+
+# a = np.zeros((3,3))
+# a[:,1] = [2,2,2]
+# print(a)
+
+# print(np.array([1,2,3]) * np.array([1,2,3,4]))
