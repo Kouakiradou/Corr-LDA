@@ -168,8 +168,12 @@ def M_step_Vectorization(images, captions, k, tol=1e-3, tol_estep=1e-3, max_iter
     LAMBDA = [np.ones((M[d], N[d])) / N[d] for d in range(D)]
     GAMMA = np.array([alpha0 + N[d] / k for d in range(D)]) #?? why use N[d] but bot M[d]
 
+    Nk = [np.zeros(k)] * D
+
     BETA = BETA0
     alpha = alpha0
+    Mean = Mean0
+    Covariance = Covariance0
     alpha_dis = 1
     beta_dis = 1
 
@@ -182,6 +186,7 @@ def M_step_Vectorization(images, captions, k, tol=1e-3, tol_estep=1e-3, max_iter
         for d in range(D):  # documents
             PHI[d], GAMMA[d,], LAMBDA[d] = E_step_Vectorization(alpha0, BETA0, Mean0, Covariance0, images[d], captions[d], PHI[d], GAMMA[d,], LAMBDA[d], max_iter, tol_estep)
             BETA += (LAMBDA[d] @ PHI[d]).T @ captions[d]
+            Nk[d] = np.sum(PHI[d], axis=0)
         BETA = BETA / (BETA.sum(axis=1)[:, None])  # rowsum=1
 
         # update alpha
@@ -192,6 +197,8 @@ def M_step_Vectorization(images, captions, k, tol=1e-3, tol_estep=1e-3, max_iter
             axis=0)
         c = (sum(g / h)) / (1 / z + sum(1 / h))
         alpha = alpha0 - (g - c) / h
+
+        # update mu and sigma
 
         alpha_dis = np.mean((alpha - alpha0) ** 2)
         beta_dis = np.mean((BETA - BETA0) ** 2)
@@ -255,3 +262,5 @@ def mmse(alpha, BETA, alpha_est, BETA_est):
 # print(a)
 
 # print(np.array([1,2,3]) * np.array([1,2,3,4]))
+# Nk = [np.zeros(3)] * 5
+# print(Nk)
