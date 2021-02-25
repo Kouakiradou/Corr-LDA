@@ -7,7 +7,7 @@ from scipy.special import digamma, polygamma
 from scipy.stats import multivariate_normal
 
 
-def simulation_data(D=500, k=10, V=1000, xi=40, max_iter=100, gamma_shape=2, gamma_scale=1):
+def simulation_data(D=50, k=10, V=1000, xi=40, max_iter=100, gamma_shape=2, gamma_scale=1):
     """Simulation the data according to LDA process. Return a list
     of N_d*V matrix(one-hot-coding) with length M.
     --------------------------------------------------------------
@@ -106,6 +106,7 @@ def E_step_Vectorization(alpha, BETA, Mean, Covariances, image, caption, Phi0, g
         multivari_pdf = np.zeros((image.shape[0], Mean.shape[0]))
         for k in range(Mean.shape[0]):
             # print(np.diag(Covariance[k,]))
+            # print(Mean[0])
             temp_pdf = multivariate_normal(mean=Mean[k], cov=np.diag(Covariances[k])).pdf(image)  # Nd*1
             multivari_pdf[:, k] = temp_pdf
 
@@ -175,7 +176,7 @@ def M_step_Vectorization(images, captions, k, tol=1e-3, tol_estep=1e-3, max_iter
 
     Covariances0 = []
     for i in range(k):
-        temp_mat = np.random.rand(5, 5)
+        temp_mat = np.random.rand(dim, dim)
         Covariances0.append(temp_mat @ temp_mat.T)
 
     PHI = [np.ones((N[d], k)) / k for d in range(D)]
@@ -194,11 +195,12 @@ def M_step_Vectorization(images, captions, k, tol=1e-3, tol_estep=1e-3, max_iter
     tol = tol ** 2
 
     for iteration in range(max_iter):
-
+        # print(len(Covariances0))
         # update PHI,GAMMA,BETA
         BETA = np.zeros((k, V))
         for d in range(D):  # documents
             PHI[d], GAMMA[d,], LAMBDA[d] = E_step_Vectorization(alpha0, BETA0, Mean0, Covariances0, images[d], captions[d], PHI[d], GAMMA[d,], LAMBDA[d], max_iter, tol_estep)
+            # print(Mean0.shape)
             BETA += (LAMBDA[d] @ PHI[d]).T @ captions[d]
             Nk += np.sum(PHI[d], axis=0)
         BETA = BETA / (BETA.sum(axis=1)[:, None])  # rowsum=1
@@ -212,24 +214,44 @@ def M_step_Vectorization(images, captions, k, tol=1e-3, tol_estep=1e-3, max_iter
         c = (sum(g / h)) / (1 / z + sum(1 / h))
         alpha = alpha0 - (g - c) / h
 
-        # update mu and sigma
-        # Mean = np.zeros((k,dim))
+        # # update mu and sigma
+        # Mean1 = np.zeros((k,dim))
         # for d in range(D):
-        #     Mean += (PHI[d] @ images[d]) * (1 / matlib.repmat(np.mat(Nk).T, 1, dim))
+        #     # print((PHI[d].T @ images[d]))
+        #     # print((1 / matlib.repmat(np.mat(Nk).T, 1, dim)))
+        #     # print((1 / matlib.repmat(np.mat(Nk).T, 1, dim)).shape)
+        #     Mean1 += np.multiply((PHI[d].T @ images[d]), (1 / matlib.repmat(np.mat(Nk).T, 1, dim)))
+        #     # cov +=
 
+
+        Mean = np.mat(np.zeros((k, dim)))
+        Covariances = [np.zeros((dim, dim))] * k
+        for d in range(D):
+            for i in range(k):
+                Mean[i, :] += np.sum(np.multiply(images[d], np.mat(PHI[d][:, i]).T), axis=0) / Nk[i]
+                cov_k = (images[d] - Mean[i]).T * np.multiply((images[d] - Mean[i]), np.mat(PHI[d][:, i]).T) / Nk[i]
+                Covariances[i] += cov_k
 
         alpha_dis = np.mean((alpha - alpha0) ** 2)
         beta_dis = np.mean((BETA - BETA0) ** 2)
         alpha0 = alpha
         BETA0 = BETA
-        Mean0 = Mean
+        Mean0 = np.asarray(Mean)
+        Covariances0 = Covariances
         if ((alpha_dis <= tol) and (beta_dis <= tol)):
             break
+        print(iteration)
 
+    # Mean = np.zeros((k, dim))
+    # for d in range(D):
+    #     for i in range(k):
+    #         Mean[i, :] += np.sum(np.multiply(Y, PHI[d][:, i]), axis=0) / Nk
+    #         cov_k = (Y - Mean[k]).T * np.multiply((Y - PHI[d][i]), gamma[:, i]) / Nk
+    #         cov.append(cov_k)
     return alpha, BETA, Mean
 
 
-def mmse(alpha, BETA, alpha_est, BETA_est):
+def mmse(alpha, BETA, Mean, alpha_est, BETA_est, Mean_est):
     """
     Calculate mse for alpha and BETA . Input the true and estimate
     alpha,BETA .
@@ -247,7 +269,8 @@ def mmse(alpha, BETA, alpha_est, BETA_est):
     beta_mse = np.mean((BETA_est - BETA) ** 2)
     alpha_est_norm = alpha_est / np.sum(alpha_est)
     alpha_mse = np.mean((alpha_est_norm - alpha_norm) ** 2)
-    return alpha_mse, beta_mse
+    Mean_mse = np.mean(np.multiply((Mean_est - Mean), (Mean_est - Mean)))
+    return alpha_mse, beta_mse, Mean_mse
 
 # docs, alpha, BETA = simulation_data2()
 # alpha_est, beta_est = M_step_Vectorization(docs=docs,k=10,tol=1e-3,tol_estep=1e-3,max_iter=100,initial_alpha_shape=100,initial_alpha_scale=0.01)
@@ -287,13 +310,21 @@ def mmse(alpha, BETA, alpha_est, BETA_est):
 # Nk = np.array([[1,2,3,4]])
 # Nf = np.array([[1,2,3,4]])
 # print(Nf @ Nf.T)
-# mat = np.mat(np.array([[1,1,1],[2,2,2],[3,3,3],[4,4,4]]))
+# mat1 = (np.array([[1,1,1],[2,2,2],[3,3,3],[4,4,4]]))
+# mat2 = (np.array([[1,1,1],[2,2,2],[3,3,3],[4,4,5]]))
+# a = (mat1 - mat2)
+# print(a)
+# print(a **2)
+# np.mean(a)
 # Nk = np.arange(5)
 # Nf = np.arange(5)
 #
 # print(Nk @ Nf)
 # vec = np.mat(np.array([1,2,3,4]))
 # print(matlib.repmat(vec.T, 1,5))
+
+
+
 # K = 3
 # D = 3
 # N = 4
@@ -317,13 +348,20 @@ def mmse(alpha, BETA, alpha_est, BETA_est):
 #     [0.3, 0.3, 0.4],
 #     [0.4, 0.4, 0.2]
 # ]))
+#
+#
+#
 # # print(gamma0[:, 2].shape)
 # # print(gamma[:,2].shape)
 #
 # for k in range(K):
+#     print(Y.shape, gamma[:, k].shape)
 #     mu[k, :] = np.sum(np.multiply(Y, gamma[:, k]), axis=0)
 #     cov_k = (Y - mu[k]).T * np.multiply((Y - mu[k]), gamma[:, k])
 #     print(cov_k)
+#
+
+
 #
 # # Mean = np.zeros(K,D)
 #
@@ -332,10 +370,11 @@ def mmse(alpha, BETA, alpha_est, BETA_est):
 # print(mu)
 # print(Mean)
 # print()
-images, captions, alpha, BETA, Mean, Covariances = simulation_data()
+
+
+images, captions, alpha, BETA, Mean, Covariances = simulation_data(D=10)
 alpha_est, beta_est, Mean_est = M_step_Vectorization(images=images, captions=captions,k=10,tol=1e-3,tol_estep=1e-3,max_iter=100,initial_alpha_shape=100,initial_alpha_scale=0.01)
-alpha_mse, beta_mse = mmse(alpha, BETA, alpha_est, beta_est)
-print(alpha_mse, beta_mse)
-# Z = np.random.multinomial(1, [0.1,0.3,0.6], 10)
-# print(Z)
-# print(np.arange(Z[0].shape[0]) @ Z[0])
+# Mean_est = np.random.normal(0, 1, (10, 5))
+alpha_mse, beta_mse, Mean_mse = mmse(alpha, BETA, Mean, alpha_est, beta_est,  Mean_est)
+print(alpha_mse, beta_mse, Mean_mse)
+

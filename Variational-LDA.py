@@ -177,3 +177,10 @@ def mmse(alpha, BETA, alpha_est, BETA_est):
     alpha_est_norm = alpha_est / np.sum(alpha_est)
     alpha_mse = np.mean((alpha_est_norm - alpha_norm) ** 2)
     return alpha_mse, beta_mse
+
+
+
+docs, alpha, BETA = simulation_data(M=50)
+alpha_est, beta_est = M_step_Vectorization(docs=docs,k=10,tol=1e-3,tol_estep=1e-3,max_iter=100,initial_alpha_shape=100,initial_alpha_scale=0.01)
+alpha_mse, beta_mse = mmse(alpha, BETA, alpha_est, beta_est)
+print(alpha_mse, beta_mse)
