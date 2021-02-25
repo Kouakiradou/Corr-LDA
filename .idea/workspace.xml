@@ -110,7 +110,9 @@
       <workItem from="1613403463445" duration="327000" />
       <workItem from="1613404089210" duration="1966000" />
       <workItem from="1613457325571" duration="22000" />
-      <workItem from="1613457373169" duration="36604000" />
+      <workItem from="1613457373169" duration="36749000" />
+      <workItem from="1614081981009" duration="12000" />
+      <workItem from="1614146796322" duration="11402000" />
     </task>
     <servers />
   </component>
@@ -122,7 +124,9 @@
       <map>
         <entry key="MAIN">
           <value>
-            <State />
+            <State>
+              <option name="COLUMN_ORDER" />
+            </State>
           </value>
         </entry>
       </map>
@@ -130,7 +134,7 @@
   </component>
   <component name="com.intellij.coverage.CoverageDataManagerImpl">
     <SUITE FILE_PATH="coverage/Corr_LDA$segmentation.coverage" NAME="segmentation Coverage Results" MODIFIED="1613464048937" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
-    <SUITE FILE_PATH="coverage/Corr_LDA$corr_LDA.coverage" NAME="corr-LDA Coverage Results" MODIFIED="1613726465797" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
+    <SUITE FILE_PATH="coverage/Corr_LDA$corr_LDA.coverage" NAME="corr-LDA Coverage Results" MODIFIED="1614242841382" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
     <SUITE FILE_PATH="coverage/Corr_LDA$project_test.coverage" NAME="corr-LDA Coverage Results" MODIFIED="1612776415984" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
   </component>
 </project>

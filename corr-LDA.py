@@ -2,6 +2,7 @@
 # -*- coding: UTF-8 -*-
 
 import numpy as np
+from numpy import matlib
 from scipy.special import digamma, polygamma
 from scipy.stats import multivariate_normal
 
@@ -36,7 +37,11 @@ def simulation_data(D=500, k=10, V=1000, xi=40, max_iter=100, gamma_shape=2, gam
     alpha = np.random.gamma(shape=gamma_shape, scale=gamma_scale, size=k)
     BETA = np.random.dirichlet(np.ones(V), k)
     Mean = np.random.normal(0, 1, (k, 5))
-    Covariance = np.random.normal(1, 1, (k, 5))
+    # Covariance = np.random.normal(1, 1, (k, 5))
+    Covariances = []
+    for i in range(k):
+        temp_mat = np.random.rand(5,5)
+        Covariances.append(temp_mat @ temp_mat.T)
 
     # image level
     N = np.random.poisson(lam=(xi - 1), size=D) + 1  # number of regions in a image, avoid 0 words
@@ -47,21 +52,22 @@ def simulation_data(D=500, k=10, V=1000, xi=40, max_iter=100, gamma_shape=2, gam
         Z = np.random.multinomial(1, THETA[d,], N[d])
         Y = np.random.randint(0, N[d], M[d])
         temp_mean = Z @ Mean
-        temp_covar = Z @ Covariance
+        indexes = np.arange(Z.shape[1]) @ Z.T
+        # temp_covar = Z @ Covariance
         R = np.zeros((N[d], 5))
         W = np.zeros((M[d], V))
         for n in range(N[d]):
-            covar_mat = np.diag(temp_covar[n,])
+            covar_mat = Covariances[indexes[n]]
             R[n,] = np.random.multivariate_normal(temp_mean[n,], covar_mat)
         images.append(R)
         for m in range(M[d]):
             temp_BETA = Z[Y[m]] @ BETA  # we can actually manipulate the matrix in one step, fix it in the future
             W[m,] = np.random.multinomial(1, temp_BETA)
         captions.append(W)
-    return images, captions, alpha, BETA, Mean, Covariance
+    return images, captions, alpha, BETA, Mean, Covariances
 
 
-def E_step_Vectorization(alpha, BETA, Mean, Covariance, image, caption, Phi0, gamma0, Lambda0, max_iter=100, tol=1e-3):
+def E_step_Vectorization(alpha, BETA, Mean, Covariances, image, caption, Phi0, gamma0, Lambda0, max_iter=100, tol=1e-3):
     """
     Vectorization Version Latent Dirichlet Allocation: E-step.
     Do to a specific document.
@@ -97,9 +103,10 @@ def E_step_Vectorization(alpha, BETA, Mean, Covariance, image, caption, Phi0, ga
         ##update gamma
         gamma = alpha + Phi.sum(axis=0)
 
-        multivari_pdf = np.zeros((image.shape[0], Mean.shape[0]))  # not sure if I should use pdf, since it is contineous
+        multivari_pdf = np.zeros((image.shape[0], Mean.shape[0]))
         for k in range(Mean.shape[0]):
-            temp_pdf = multivariate_normal(mean=Mean[k], cov=np.diag(Covariance[k,])).pdf(image)  # Nd*1
+            # print(np.diag(Covariance[k,]))
+            temp_pdf = multivariate_normal(mean=Mean[k], cov=np.diag(Covariances[k])).pdf(image)  # Nd*1
             multivari_pdf[:, k] = temp_pdf
 
         ##update Phi
@@ -157,23 +164,30 @@ def M_step_Vectorization(images, captions, k, tol=1e-3, tol_estep=1e-3, max_iter
     V = captions[1].shape[1]
     N = [image.shape[0] for image in images]
     M = [caption.shape[0] for caption in captions]
-
+    dim = images[0].shape[1]
+    print("the dimension of image vector is ", dim)
 
     # initialization
     BETA0 = np.random.dirichlet(np.ones(V), k)
     alpha0 = np.random.gamma(shape=initial_alpha_shape, scale=initial_alpha_scale, size=k)
-    Mean0 = np.random.normal(0, 1, (k, 5))
-    Covariance0 = np.random.normal(1, 1, (k, 5))
+    Mean0 = np.random.normal(0, 1, (k, dim))
+    # Covariances0 = np.random.normal(1, 1, (k, dim))
+
+    Covariances0 = []
+    for i in range(k):
+        temp_mat = np.random.rand(5, 5)
+        Covariances0.append(temp_mat @ temp_mat.T)
+
     PHI = [np.ones((N[d], k)) / k for d in range(D)]
     LAMBDA = [np.ones((M[d], N[d])) / N[d] for d in range(D)]
     GAMMA = np.array([alpha0 + N[d] / k for d in range(D)]) #?? why use N[d] but bot M[d]
 
-    Nk = [np.zeros(k)] * D
+    Nk = np.zeros(k)
 
     BETA = BETA0
     alpha = alpha0
     Mean = Mean0
-    Covariance = Covariance0
+    Covariances = Covariances0
     alpha_dis = 1
     beta_dis = 1
 
@@ -184,9 +198,9 @@ def M_step_Vectorization(images, captions, k, tol=1e-3, tol_estep=1e-3, max_iter
         # update PHI,GAMMA,BETA
         BETA = np.zeros((k, V))
         for d in range(D):  # documents
-            PHI[d], GAMMA[d,], LAMBDA[d] = E_step_Vectorization(alpha0, BETA0, Mean0, Covariance0, images[d], captions[d], PHI[d], GAMMA[d,], LAMBDA[d], max_iter, tol_estep)
+            PHI[d], GAMMA[d,], LAMBDA[d] = E_step_Vectorization(alpha0, BETA0, Mean0, Covariances0, images[d], captions[d], PHI[d], GAMMA[d,], LAMBDA[d], max_iter, tol_estep)
             BETA += (LAMBDA[d] @ PHI[d]).T @ captions[d]
-            Nk[d] = np.sum(PHI[d], axis=0)
+            Nk += np.sum(PHI[d], axis=0)
         BETA = BETA / (BETA.sum(axis=1)[:, None])  # rowsum=1
 
         # update alpha
@@ -199,15 +213,20 @@ def M_step_Vectorization(images, captions, k, tol=1e-3, tol_estep=1e-3, max_iter
         alpha = alpha0 - (g - c) / h
 
         # update mu and sigma
+        # Mean = np.zeros((k,dim))
+        # for d in range(D):
+        #     Mean += (PHI[d] @ images[d]) * (1 / matlib.repmat(np.mat(Nk).T, 1, dim))
+
 
         alpha_dis = np.mean((alpha - alpha0) ** 2)
         beta_dis = np.mean((BETA - BETA0) ** 2)
         alpha0 = alpha
         BETA0 = BETA
+        Mean0 = Mean
         if ((alpha_dis <= tol) and (beta_dis <= tol)):
             break
 
-    return alpha, BETA
+    return alpha, BETA, Mean
 
 
 def mmse(alpha, BETA, alpha_est, BETA_est):
@@ -261,6 +280,62 @@ def mmse(alpha, BETA, alpha_est, BETA_est):
 # a[:,1] = [2,2,2]
 # print(a)
 
-# print(np.array([1,2,3]) * np.array([1,2,3,4]))
+# print(np.array([1,2,3,4]) * np.array([1,2,3,4]))
 # Nk = [np.zeros(3)] * 5
 # print(Nk)
+
+# Nk = np.array([[1,2,3,4]])
+# Nf = np.array([[1,2,3,4]])
+# print(Nf @ Nf.T)
+# mat = np.mat(np.array([[1,1,1],[2,2,2],[3,3,3],[4,4,4]]))
+# Nk = np.arange(5)
+# Nf = np.arange(5)
+#
+# print(Nk @ Nf)
+# vec = np.mat(np.array([1,2,3,4]))
+# print(matlib.repmat(vec.T, 1,5))
+# K = 3
+# D = 3
+# N = 4
+# mu = np.zeros((K, D))
+# Y = np.mat(np.array([
+#     [1, 1, 1],
+#     [2, 2, 2],
+#     [3, 3, 3],
+#     [4, 4, 4],
+# ]))
+#
+# gamma0 = np.array([
+#     [0.1, 0.8, 0.1],
+#     [0.2, 0.2, 0.6],
+#     [0.3, 0.3, 0.4],
+#     [0.4, 0.4, 0.2]
+# ])
+# gamma = np.mat(np.array([
+#     [0.1, 0.8, 0.1],
+#     [0.2, 0.2, 0.6],
+#     [0.3, 0.3, 0.4],
+#     [0.4, 0.4, 0.2]
+# ]))
+# # print(gamma0[:, 2].shape)
+# # print(gamma[:,2].shape)
+#
+# for k in range(K):
+#     mu[k, :] = np.sum(np.multiply(Y, gamma[:, k]), axis=0)
+#     cov_k = (Y - mu[k]).T * np.multiply((Y - mu[k]), gamma[:, k])
+#     print(cov_k)
+#
+# # Mean = np.zeros(K,D)
+#
+#
+# Mean = gamma.T @ Y
+# print(mu)
+# print(Mean)
+# print()
+images, captions, alpha, BETA, Mean, Covariances = simulation_data()
+alpha_est, beta_est, Mean_est = M_step_Vectorization(images=images, captions=captions,k=10,tol=1e-3,tol_estep=1e-3,max_iter=100,initial_alpha_shape=100,initial_alpha_scale=0.01)
+alpha_mse, beta_mse = mmse(alpha, BETA, alpha_est, beta_est)
+print(alpha_mse, beta_mse)
+# Z = np.random.multinomial(1, [0.1,0.3,0.6], 10)
+# print(Z)
+# print(np.arange(Z[0].shape[0]) @ Z[0])
