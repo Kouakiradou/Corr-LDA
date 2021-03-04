@@ -5,7 +5,9 @@ import numpy as np
 from numpy import matlib
 from scipy.special import digamma, polygamma
 from scipy.stats import multivariate_normal
-
+import matplotlib.pyplot as plt
+import matplotlib
+matplotlib.use('TkAgg')
 
 def simulation_data(D=50, k=10, V=1000, xi=40, max_iter=100, gamma_shape=2, gamma_scale=1):
     """Simulation the data according to LDA process. Return a list
@@ -107,12 +109,25 @@ def E_step_Vectorization(alpha, BETA, Mean, Covariances, image, caption, Phi0, g
         for k in range(Mean.shape[0]):
             # print(np.diag(Covariance[k,]))
             # print(Mean[0])
-            temp_pdf = multivariate_normal(mean=Mean[k], cov=np.diag(Covariances[k])).pdf(image)  # Nd*1
+            temp_pdf = multivariate_normal(mean=Mean[k], cov=Covariances[k]).pdf(image)  # Nd*1
             multivari_pdf[:, k] = temp_pdf
 
         ##update Phi
         Phi = multivari_pdf * np.exp(digamma(gamma) - digamma(sum(gamma))) * np.exp(Lambdaa.T @ (caption @ BETA.T)) #please double check
+        if 0 in Phi.sum(axis=1)[:, None]:
+            print("0 in the Phi")
+            print("-----Phi-------")
+            print(Phi)
+            print("-----Phi sum-------")
+            print(Phi.sum(axis=1)[:, None])
+            print("-----pdf-------")
+            print(multivari_pdf)
+            print("-----diagamma-------")
+            print(np.exp(digamma(gamma) - digamma(sum(gamma))))
+            print("-----exp-------")
+            print(np.exp(Lambdaa.T @ (caption @ BETA.T)))
         Phi = Phi / (Phi.sum(axis=1)[:, None])  # row sum to 1
+
 
         ##update Lambda
         Lambdaa = np.exp((caption @ BETA.T) @ Phi.T)
@@ -140,7 +155,7 @@ def E_step_Vectorization(alpha, BETA, Mean, Covariances, image, caption, Phi0, g
     return Phi, gamma, Lambdaa
 
 
-def M_step_Vectorization(images, captions, k, tol=1e-3, tol_estep=1e-3, max_iter=100, initial_alpha_shape=100,
+def  M_step_Vectorization(images, captions, k, tol=1e-3, tol_estep=1e-3, max_iter=100, initial_alpha_shape=100,
                          initial_alpha_scale=0.01):
     """
     Vectorization version VI EM for Latent Dirichlet Allocation: M-step.
@@ -372,9 +387,19 @@ def mmse(alpha, BETA, Mean, alpha_est, BETA_est, Mean_est):
 # print()
 
 
-images, captions, alpha, BETA, Mean, Covariances = simulation_data(D=10)
-alpha_est, beta_est, Mean_est = M_step_Vectorization(images=images, captions=captions,k=10,tol=1e-3,tol_estep=1e-3,max_iter=100,initial_alpha_shape=100,initial_alpha_scale=0.01)
+images, captions, alpha, BETA, Mean, Covariances = simulation_data(D=10, k=2, V=5)
+alpha_est, beta_est, Mean_est = M_step_Vectorization(images=images, captions=captions,k=2,tol=1e-3,tol_estep=1e-3,max_iter=100,initial_alpha_shape=100,initial_alpha_scale=0.01)
 # Mean_est = np.random.normal(0, 1, (10, 5))
-alpha_mse, beta_mse, Mean_mse = mmse(alpha, BETA, Mean, alpha_est, beta_est,  Mean_est)
-print(alpha_mse, beta_mse, Mean_mse)
+print(BETA)
+print(beta_est)
+# alpha_mse, beta_mse, Mean_mse = mmse(alpha, BETA, Mean, alpha_est, beta_est,  Mean_est)
+# print(alpha_mse, beta_mse, Mean_mse)
 
+# plt.imshow((BETA @ beta_est.T) / 1000)
+# plt.colorbar()
+# plt.show()
+
+# mat = np.ones((5, 5))
+# # print(mat.contains)
+# mat[0][0] = 0
+# print(4 in mat.sum(axis=1)[:,None])
