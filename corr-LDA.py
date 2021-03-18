@@ -69,7 +69,8 @@ def simulation_data(D=50, k=10, V=1000, xi=40, max_iter=100, gamma_shape=2, gamm
     return images, captions, alpha, BETA, Mean, Covariances
 
 
-def E_step_Vectorization(alpha, BETA, Mean, Covariances, image, caption, Phi0, gamma0, Lambda0, max_iter=100, tol=1e-3):
+def E_step_Vectorization(alpha, BETA, Mean, Covariances, image, caption, Phi0, gamma0, Lambda0, max_iter=100, tol=1e-4):
+    print("new doc")
     """
     Vectorization Version Latent Dirichlet Allocation: E-step.
     Do to a specific document.
@@ -114,20 +115,29 @@ def E_step_Vectorization(alpha, BETA, Mean, Covariances, image, caption, Phi0, g
 
         ##update Phi
         Phi = multivari_pdf * np.exp(digamma(gamma) - digamma(sum(gamma))) * np.exp(Lambdaa.T @ (caption @ BETA.T)) #please double check
-        if 0 in Phi.sum(axis=1)[:, None]:
-            print("0 in the Phi")
-            print("-----Phi-------")
-            print(Phi)
-            print("-----Phi sum-------")
-            print(Phi.sum(axis=1)[:, None])
-            print("-----pdf-------")
-            print(multivari_pdf)
-            print("-----diagamma-------")
-            print(np.exp(digamma(gamma) - digamma(sum(gamma))))
-            print("-----exp-------")
-            print(np.exp(Lambdaa.T @ (caption @ BETA.T)))
-        Phi = Phi / (Phi.sum(axis=1)[:, None])  # row sum to 1
+        # if 0 in Phi.sum(axis=1)[:, None]:
+            # print("0 in the Phi")
+        # print("-----Phi-------")
+        # print(Phi)
+        # print("-----Phi sum-------")
+        # print(Phi.sum(axis=1)[:, None])
+        # print("-----pdf-------")
+        # print(multivari_pdf)
+        # print("-----diagamma-------")
+        # print(np.exp(digamma(gamma) - digamma(sum(gamma))))
+        # print("-----exp-------")
+        # print(np.exp(Lambdaa.T @ (caption @ BETA.T)))
+        # print(Lambdaa.T)
+        # print((caption @ BETA.T))
+        # print("-----mean-------")
+        # print(Mean)
+        # print("-----covariances-------")
+        # print(Covariances)
+        # print("-----image-------")
+        # print(image)
 
+        Phi = Phi / (Phi.sum(axis=1)[:, None])  # row sum to 1
+        print(Phi)
 
         ##update Lambda
         Lambdaa = np.exp((caption @ BETA.T) @ Phi.T)
@@ -148,7 +158,14 @@ def E_step_Vectorization(alpha, BETA, Mean, Covariances, image, caption, Phi0, g
         Phi0 = Phi
         gamma0 = gamma
         Lambda0 = Lambdaa
+        if phi_delta <= tol:
+            print("phi tol")
 
+        if gamma_delta <= tol:
+            print("gamma tol")
+
+        if Lambdaa_delta <= tol:
+            print("lambda tol")
         if (phi_delta <= tol) and (gamma_delta <= tol) and (Lambdaa_delta <= tol):
             break
 
@@ -215,7 +232,7 @@ def  M_step_Vectorization(images, captions, k, tol=1e-3, tol_estep=1e-3, max_ite
         BETA = np.zeros((k, V))
         for d in range(D):  # documents
             PHI[d], GAMMA[d,], LAMBDA[d] = E_step_Vectorization(alpha0, BETA0, Mean0, Covariances0, images[d], captions[d], PHI[d], GAMMA[d,], LAMBDA[d], max_iter, tol_estep)
-            # print(Mean0.shape)
+            # print(LAMBDA[d])
             BETA += (LAMBDA[d] @ PHI[d]).T @ captions[d]
             Nk += np.sum(PHI[d], axis=0)
         BETA = BETA / (BETA.sum(axis=1)[:, None])  # rowsum=1
@@ -292,11 +309,13 @@ def mmse(alpha, BETA, Mean, alpha_est, BETA_est, Mean_est):
 # alpha_mse, beta_mse = mmse(alpha, BETA, alpha_est, beta_est)
 # print(alpha_mse, beta_mse)
 
-
-# covar_mat = np.diag([1,1,1,1,1])
-# a = multivariate_normal(mean=[0,0,0,0,0], cov=covar_mat).pdf([[0,0,0,0,0],[1,1,1,1,1]])
-# print(a)
-
+'''
+one case of multivariate distribution 
+temp_mat = np.array([[1,0,2,0,0],[1,-4,1,3,1],[1,-2,2,1,1],[1,1,6,7,1],[1,-1,2,1,1]])
+covar_mat = temp_mat @ temp_mat.T
+a = multivariate_normal(mean=[0,0,0,0,0], cov=covar_mat).pdf([[0,0,0,0,0],[1,1,1,1,1]])
+print(a)
+'''
 
 # a = np.random.multivariate_normal([0,0,0,0,0], covar_mat)
 # print(a)
@@ -387,11 +406,14 @@ def mmse(alpha, BETA, Mean, alpha_est, BETA_est, Mean_est):
 # print()
 
 
-images, captions, alpha, BETA, Mean, Covariances = simulation_data(D=10, k=2, V=5)
+images, captions, alpha, BETA, Mean, Covariances = simulation_data(D=10, k=2, V=5, xi=3)
 alpha_est, beta_est, Mean_est = M_step_Vectorization(images=images, captions=captions,k=2,tol=1e-3,tol_estep=1e-3,max_iter=100,initial_alpha_shape=100,initial_alpha_scale=0.01)
 # Mean_est = np.random.normal(0, 1, (10, 5))
 print(BETA)
 print(beta_est)
+
+
+
 # alpha_mse, beta_mse, Mean_mse = mmse(alpha, BETA, Mean, alpha_est, beta_est,  Mean_est)
 # print(alpha_mse, beta_mse, Mean_mse)
 
@@ -399,7 +421,31 @@ print(beta_est)
 # plt.colorbar()
 # plt.show()
 
-# mat = np.ones((5, 5))
-# # print(mat.contains)
-# mat[0][0] = 0
-# print(4 in mat.sum(axis=1)[:,None])
+'''
+one case of getting zero value from multivariate distribution
+a = np.array([[ 0.01812493,  0.00896318,  0.00759664,  0.0121407 ,  0.01321472],
+       [ 0.00896318,  0.04643877, -0.02641472,  0.04473668,  0.00439261],
+       [ 0.00759664, -0.02641472,  0.05096189, -0.02436573,  0.00499702],
+       [ 0.0121407 ,  0.04473668, -0.02436573,  0.05148774,  0.00729521],
+       [ 0.01321472,  0.00439261,  0.00499702,  0.00729521,  0.01190439]])
+
+b= np.array([[ 0.01812493,  0.00896318,  0.00759664,  0.0121407 ,  0.01321472],
+       [ 0.00896318,  0.04643877, -0.02641472,  0.04473668,  0.00439261],
+       [ 0.00759664, -0.02641472,  0.05096189, -0.02436573,  0.00499702],
+       [ 0.0121407 ,  0.04473668, -0.02436573,  0.05148774,  0.00729521],
+       [ 0.01321472,  0.00439261,  0.00499702,  0.00729521,  0.01190439]])
+
+am = np.array([ 1.51625027e-03, -2.27522200e-02,  1.90373597e-02, -2.27244677e-02,
+   3.88784631e-03])
+
+bm = np.array([ 7.17772002e-11, -9.86568567e-10,  8.29031276e-10, -9.86769749e-10,
+   1.74394451e-10])
+
+i = np.array([-1.71213588e+00, -3.74574326e+00, -2.52140196e-01, -1.01079516e+00,
+  -4.54723256e-01])
+
+pdf = multivariate_normal(mean=am, cov=a).pdf(i)
+print(pdf)
+'''
+
+

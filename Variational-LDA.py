@@ -154,8 +154,7 @@ def M_step_Vectorization(docs, k, tol=1e-3, tol_estep=1e-3, max_iter=100, initia
         BETA0 = BETA
         if ((alpha_dis <= tol) and (beta_dis <= tol)):
             break
-
-    return alpha, BETA
+    return alpha, BETA, PHI
 
 
 def mmse(alpha, BETA, alpha_est, BETA_est):
@@ -181,7 +180,8 @@ def mmse(alpha, BETA, alpha_est, BETA_est):
 
 
 docs, alpha, BETA = simulation_data(M=100,k=2, V=5)
-alpha_est, beta_est = M_step_Vectorization(docs=docs,k=2,tol=1e-3,tol_estep=1e-3,max_iter=100,initial_alpha_shape=100,initial_alpha_scale=0.01)
+alpha_est, beta_est,PHI= M_step_Vectorization(docs=docs,k=2,tol=1e-3,tol_estep=1e-3,max_iter=100,initial_alpha_shape=100,initial_alpha_scale=0.01)
+print(PHI[0])
 print(BETA)
 print(beta_est)
 # alpha_mse, beta_mse = mmse(alpha, BETA, alpha_est, beta_est)

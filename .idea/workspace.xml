@@ -2,6 +2,12 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="ceb4527c-f354-425b-b1e2-4adf958f7c7a" name="Default Changelist" comment="">
+      <change afterPath="$PROJECT_DIR$/colours.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/lda_real.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/realdata_ap.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/realdata_news.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/simple_image_generation.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/sklearnLDA.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Variational-LDA.py" beforeDir="false" afterPath="$PROJECT_DIR$/Variational-LDA.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/corr-LDA.py" beforeDir="false" afterPath="$PROJECT_DIR$/corr-LDA.py" afterDir="false" />
@@ -46,7 +52,7 @@
       </list>
     </option>
   </component>
-  <component name="RunManager" selected="Python.corr-LDA">
+  <component name="RunManager" selected="Python.simple_image_generation">
     <configuration name="Variational-LDA" type="PythonConfigurationType" factoryName="Python" temporary="true">
       <module name="Corr-LDA" />
       <option name="INTERPRETER_OPTIONS" value="" />
@@ -61,6 +67,28 @@
       <option name="ADD_SOURCE_ROOTS" value="true" />
       <EXTENSION ID="PythonCoverageRunConfigurationExtension" runner="coverage.py" />
       <option name="SCRIPT_NAME" value="$PROJECT_DIR$/Variational-LDA.py" />
+      <option name="PARAMETERS" value="" />
+      <option name="SHOW_COMMAND_LINE" value="false" />
+      <option name="EMULATE_TERMINAL" value="false" />
+      <option name="MODULE_MODE" value="false" />
+      <option name="REDIRECT_INPUT" value="false" />
+      <option name="INPUT_FILE" value="" />
+      <method v="2" />
+    </configuration>
+    <configuration name="colours" type="PythonConfigurationType" factoryName="Python" temporary="true">
+      <module name="Corr-LDA" />
+      <option name="INTERPRETER_OPTIONS" value="" />
+      <option name="PARENT_ENVS" value="true" />
+      <envs>
+        <env name="PYTHONUNBUFFERED" value="1" />
+      </envs>
+      <option name="SDK_HOME" value="" />
+      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$" />
+      <option name="IS_MODULE_SDK" value="true" />
+      <option name="ADD_CONTENT_ROOTS" value="true" />
+      <option name="ADD_SOURCE_ROOTS" value="true" />
+      <EXTENSION ID="PythonCoverageRunConfigurationExtension" runner="coverage.py" />
+      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/colours.py" />
       <option name="PARAMETERS" value="" />
       <option name="SHOW_COMMAND_LINE" value="false" />
       <option name="EMULATE_TERMINAL" value="false" />
@@ -91,6 +119,50 @@
       <option name="INPUT_FILE" value="" />
       <method v="2" />
     </configuration>
+    <configuration name="realdata" type="PythonConfigurationType" factoryName="Python" temporary="true">
+      <module name="Corr-LDA" />
+      <option name="INTERPRETER_OPTIONS" value="" />
+      <option name="PARENT_ENVS" value="true" />
+      <envs>
+        <env name="PYTHONUNBUFFERED" value="1" />
+      </envs>
+      <option name="SDK_HOME" value="" />
+      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$" />
+      <option name="IS_MODULE_SDK" value="true" />
+      <option name="ADD_CONTENT_ROOTS" value="true" />
+      <option name="ADD_SOURCE_ROOTS" value="true" />
+      <EXTENSION ID="PythonCoverageRunConfigurationExtension" runner="coverage.py" />
+      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/realdata_news.py" />
+      <option name="PARAMETERS" value="" />
+      <option name="SHOW_COMMAND_LINE" value="false" />
+      <option name="EMULATE_TERMINAL" value="false" />
+      <option name="MODULE_MODE" value="false" />
+      <option name="REDIRECT_INPUT" value="false" />
+      <option name="INPUT_FILE" value="" />
+      <method v="2" />
+    </configuration>
+    <configuration name="realdata_ap" type="PythonConfigurationType" factoryName="Python" temporary="true">
+      <module name="Corr-LDA" />
+      <option name="INTERPRETER_OPTIONS" value="" />
+      <option name="PARENT_ENVS" value="true" />
+      <envs>
+        <env name="PYTHONUNBUFFERED" value="1" />
+      </envs>
+      <option name="SDK_HOME" value="" />
+      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$" />
+      <option name="IS_MODULE_SDK" value="true" />
+      <option name="ADD_CONTENT_ROOTS" value="true" />
+      <option name="ADD_SOURCE_ROOTS" value="true" />
+      <EXTENSION ID="PythonCoverageRunConfigurationExtension" runner="coverage.py" />
+      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/realdata_ap.py" />
+      <option name="PARAMETERS" value="" />
+      <option name="SHOW_COMMAND_LINE" value="false" />
+      <option name="EMULATE_TERMINAL" value="false" />
+      <option name="MODULE_MODE" value="false" />
+      <option name="REDIRECT_INPUT" value="false" />
+      <option name="INPUT_FILE" value="" />
+      <method v="2" />
+    </configuration>
     <configuration name="segmentation" type="PythonConfigurationType" factoryName="Python" nameIsGenerated="true">
       <module name="Corr-LDA" />
       <option name="INTERPRETER_OPTIONS" value="" />
@@ -113,14 +185,44 @@
       <option name="INPUT_FILE" value="" />
       <method v="2" />
     </configuration>
+    <configuration name="simple_image_generation" type="PythonConfigurationType" factoryName="Python" temporary="true">
+      <module name="Corr-LDA" />
+      <option name="INTERPRETER_OPTIONS" value="" />
+      <option name="PARENT_ENVS" value="true" />
+      <envs>
+        <env name="PYTHONUNBUFFERED" value="1" />
+      </envs>
+      <option name="SDK_HOME" value="" />
+      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$" />
+      <option name="IS_MODULE_SDK" value="true" />
+      <option name="ADD_CONTENT_ROOTS" value="true" />
+      <option name="ADD_SOURCE_ROOTS" value="true" />
+      <EXTENSION ID="PythonCoverageRunConfigurationExtension" runner="coverage.py" />
+      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/simple_image_generation.py" />
+      <option name="PARAMETERS" value="" />
+      <option name="SHOW_COMMAND_LINE" value="false" />
+      <option name="EMULATE_TERMINAL" value="false" />
+      <option name="MODULE_MODE" value="false" />
+      <option name="REDIRECT_INPUT" value="false" />
+      <option name="INPUT_FILE" value="" />
+      <method v="2" />
+    </configuration>
     <list>
       <item itemvalue="Python.segmentation" />
       <item itemvalue="Python.corr-LDA" />
       <item itemvalue="Python.Variational-LDA" />
+      <item itemvalue="Python.realdata" />
+      <item itemvalue="Python.realdata_ap" />
+      <item itemvalue="Python.simple_image_generation" />
+      <item itemvalue="Python.colours" />
     </list>
     <recent_temporary>
       <list>
+        <item itemvalue="Python.simple_image_generation" />
+        <item itemvalue="Python.colours" />
         <item itemvalue="Python.Variational-LDA" />
+        <item itemvalue="Python.realdata" />
+        <item itemvalue="Python.realdata_ap" />
       </list>
     </recent_temporary>
   </component>
@@ -141,7 +243,11 @@
       <workItem from="1613457325571" duration="22000" />
       <workItem from="1613457373169" duration="36749000" />
       <workItem from="1614081981009" duration="12000" />
-      <workItem from="1614146796322" duration="28445000" />
+      <workItem from="1614146796322" duration="31851000" />
+      <workItem from="1615292649880" duration="1592000" />
+      <workItem from="1615365594925" duration="5313000" />
+      <workItem from="1615448449406" duration="11968000" />
+      <workItem from="1615967843370" duration="10958000" />
     </task>
     <servers />
   </component>
@@ -161,10 +267,25 @@
       </map>
     </option>
   </component>
+  <component name="XDebuggerManager">
+    <breakpoint-manager>
+      <breakpoints>
+        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/corr-LDA.py</url>
+          <line>104</line>
+          <option name="timeStamp" value="1" />
+        </line-breakpoint>
+      </breakpoints>
+    </breakpoint-manager>
+  </component>
   <component name="com.intellij.coverage.CoverageDataManagerImpl">
     <SUITE FILE_PATH="coverage/Corr_LDA$segmentation.coverage" NAME="segmentation Coverage Results" MODIFIED="1613464048937" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
-    <SUITE FILE_PATH="coverage/Corr_LDA$corr_LDA.coverage" NAME="corr-LDA Coverage Results" MODIFIED="1614849981368" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
-    <SUITE FILE_PATH="coverage/Corr_LDA$Variational_LDA.coverage" NAME="Variational-LDA Coverage Results" MODIFIED="1614765323654" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
+    <SUITE FILE_PATH="coverage/Corr_LDA$realdata_ap.coverage" NAME="realdata_ap Coverage Results" MODIFIED="1615454160721" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
+    <SUITE FILE_PATH="coverage/Corr_LDA$realdata.coverage" NAME="realdata Coverage Results" MODIFIED="1615462623292" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
+    <SUITE FILE_PATH="coverage/Corr_LDA$corr_LDA.coverage" NAME="corr-LDA Coverage Results" MODIFIED="1615466143186" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
+    <SUITE FILE_PATH="coverage/Corr_LDA$colours.coverage" NAME="colours Coverage Results" MODIFIED="1615986365456" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
+    <SUITE FILE_PATH="coverage/Corr_LDA$Variational_LDA.coverage" NAME="Variational-LDA Coverage Results" MODIFIED="1615469500750" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
     <SUITE FILE_PATH="coverage/Corr_LDA$project_test.coverage" NAME="corr-LDA Coverage Results" MODIFIED="1612776415984" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
+    <SUITE FILE_PATH="coverage/Corr_LDA$simple_image_generation.coverage" NAME="simple_image_generation Coverage Results" MODIFIED="1615987703889" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
   </component>
 </project>
