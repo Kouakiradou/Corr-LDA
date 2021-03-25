@@ -2,27 +2,8 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="ceb4527c-f354-425b-b1e2-4adf958f7c7a" name="Default Changelist" comment="">
-      <change afterPath="$PROJECT_DIR$/sklearn_news.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/test.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.gitignore" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Variational-LDA.py" beforeDir="false" afterPath="$PROJECT_DIR$/Variational-LDA.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/colours.py" beforeDir="false" afterPath="$PROJECT_DIR$/colours.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/corr-LDA.py" beforeDir="false" afterPath="$PROJECT_DIR$/corr_LDA.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/images/0.png" beforeDir="false" afterPath="$PROJECT_DIR$/images/0.png" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/images/1.png" beforeDir="false" afterPath="$PROJECT_DIR$/images/1.png" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/images/2.png" beforeDir="false" afterPath="$PROJECT_DIR$/images/2.png" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/images/3.png" beforeDir="false" afterPath="$PROJECT_DIR$/images/3.png" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/images/4.png" beforeDir="false" afterPath="$PROJECT_DIR$/images/4.png" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/images/5.png" beforeDir="false" afterPath="$PROJECT_DIR$/images/5.png" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/images/6.png" beforeDir="false" afterPath="$PROJECT_DIR$/images/6.png" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/images/7.png" beforeDir="false" afterPath="$PROJECT_DIR$/images/7.png" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/images/8.png" beforeDir="false" afterPath="$PROJECT_DIR$/images/8.png" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/images/9.png" beforeDir="false" afterPath="$PROJECT_DIR$/images/9.png" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/images/download.jpeg" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/realdata_news.py" beforeDir="false" afterPath="$PROJECT_DIR$/realdata_news.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/segmentation.py" beforeDir="false" afterPath="$PROJECT_DIR$/segmentation.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/simple_image_generation.py" beforeDir="false" afterPath="$PROJECT_DIR$/simple_image_generation.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/sklearnLDA.py" beforeDir="false" afterPath="$PROJECT_DIR$/sklearn_ap.py" afterDir="false" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="SHOW_DIALOG" value="false" />
@@ -259,7 +240,7 @@
       <workItem from="1615292649880" duration="1592000" />
       <workItem from="1615365594925" duration="5313000" />
       <workItem from="1615448449406" duration="11968000" />
-      <workItem from="1615967843370" duration="44949000" />
+      <workItem from="1615967843370" duration="45299000" />
     </task>
     <servers />
   </component>
