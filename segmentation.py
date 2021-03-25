@@ -13,7 +13,7 @@ from skimage.segmentation import mark_boundaries
 from skimage.util import img_as_float
 
 # img = img_as_float(astronaut()[::2, ::2])
-img = img_as_float(io.imread("images/download.jpeg"))
+img = img_as_float(io.imread("images/1.png"))
 segments_fz = felzenszwalb(img, scale=100, sigma=0.5, min_size=50)
 segments_slic = slic(img, n_segments=250, compactness=10, sigma=1,
                      start_label=1)

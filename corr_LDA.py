@@ -70,7 +70,7 @@ def simulation_data(D=50, k=10, V=1000, xi=40, max_iter=100, gamma_shape=2, gamm
 
 
 def E_step_Vectorization(alpha, BETA, Mean, Covariances, image, caption, Phi0, gamma0, Lambda0, max_iter=100, tol=1e-4):
-    print("new doc")
+    # print("new doc")
     """
     Vectorization Version Latent Dirichlet Allocation: E-step.
     Do to a specific document.
@@ -114,9 +114,12 @@ def E_step_Vectorization(alpha, BETA, Mean, Covariances, image, caption, Phi0, g
             multivari_pdf[:, k] = temp_pdf
 
         ##update Phi
-        Phi = multivari_pdf * np.exp(digamma(gamma) - digamma(sum(gamma))) * np.exp(Lambdaa.T @ (caption @ BETA.T)) #please double check
+        Phi = multivari_pdf * np.exp(digamma(gamma) - digamma(sum(gamma))) * np.exp(Lambdaa.T @ np.log(caption @ BETA.T)) #please double check
+        # exp = np.exp(Lambdaa.T @ np.log(caption @ BETA.T))
+        # diag = np.exp(digamma(gamma) - digamma(sum(gamma)))
         # if 0 in Phi.sum(axis=1)[:, None]:
-            # print("0 in the Phi")
+        #     print("0 in the Phi")
+        #     print(Phi)
         # print("-----Phi-------")
         # print(Phi)
         # print("-----Phi sum-------")
@@ -136,11 +139,11 @@ def E_step_Vectorization(alpha, BETA, Mean, Covariances, image, caption, Phi0, g
         # print("-----image-------")
         # print(image)
 
+
         Phi = Phi / (Phi.sum(axis=1)[:, None])  # row sum to 1
-        print(Phi)
 
         ##update Lambda
-        Lambdaa = np.exp((caption @ BETA.T) @ Phi.T)
+        Lambdaa = np.exp(np.log(caption @ BETA.T) @ Phi.T)
         Lambdaa = Lambdaa / (Lambdaa.sum(axis=1)[:, None])
 
         # Phi = (doc @ BETA.T) * np.exp(digamma(gamma) - digamma(sum(gamma)))
@@ -158,14 +161,14 @@ def E_step_Vectorization(alpha, BETA, Mean, Covariances, image, caption, Phi0, g
         Phi0 = Phi
         gamma0 = gamma
         Lambda0 = Lambdaa
-        if phi_delta <= tol:
-            print("phi tol")
-
-        if gamma_delta <= tol:
-            print("gamma tol")
-
-        if Lambdaa_delta <= tol:
-            print("lambda tol")
+        # if phi_delta <= tol:
+        #     print("phi tol")
+        #
+        # if gamma_delta <= tol:
+        #     print("gamma tol")
+        #
+        # if Lambdaa_delta <= tol:
+        #     print("lambda tol")
         if (phi_delta <= tol) and (gamma_delta <= tol) and (Lambdaa_delta <= tol):
             break
 
@@ -204,7 +207,6 @@ def  M_step_Vectorization(images, captions, k, tol=1e-3, tol_estep=1e-3, max_ite
     BETA0 = np.random.dirichlet(np.ones(V), k)
     alpha0 = np.random.gamma(shape=initial_alpha_shape, scale=initial_alpha_scale, size=k)
     Mean0 = np.random.normal(0, 1, (k, dim))
-    # Covariances0 = np.random.normal(1, 1, (k, dim))
 
     Covariances0 = []
     for i in range(k):
@@ -215,30 +217,28 @@ def  M_step_Vectorization(images, captions, k, tol=1e-3, tol_estep=1e-3, max_ite
     LAMBDA = [np.ones((M[d], N[d])) / N[d] for d in range(D)]
     GAMMA = np.array([alpha0 + N[d] / k for d in range(D)]) #?? why use N[d] but bot M[d]
 
-    Nk = np.zeros(k)
+    # Nk = np.zeros(k)
 
-    BETA = BETA0
-    alpha = alpha0
-    Mean = Mean0
-    Covariances = Covariances0
+    # BETA = BETA0
+    # alpha = alpha0
+    # Mean = Mean0
+    # Covariances = Covariances0
     alpha_dis = 1
     beta_dis = 1
 
     tol = tol ** 2
 
     for iteration in range(max_iter):
-        # print(len(Covariances0))
         # update PHI,GAMMA,BETA
+        Nk = np.zeros(k)
         BETA = np.zeros((k, V))
         for d in range(D):  # documents
             PHI[d], GAMMA[d,], LAMBDA[d] = E_step_Vectorization(alpha0, BETA0, Mean0, Covariances0, images[d], captions[d], PHI[d], GAMMA[d,], LAMBDA[d], max_iter, tol_estep)
-            # print(LAMBDA[d])
             BETA += (LAMBDA[d] @ PHI[d]).T @ captions[d]
-            Nk += np.sum(PHI[d], axis=0)
+            Nk += np.sum(PHI[d], axis=0)  #calculating the Nk for EM on mean and covariance
         BETA = BETA / (BETA.sum(axis=1)[:, None])  # rowsum=1
 
         # update alpha
-
         z = D * polygamma(1, sum(alpha0))
         h = -D * polygamma(1, alpha0)
         g = D * (digamma(sum(alpha0)) - digamma(alpha0)) + (digamma(GAMMA) - digamma(GAMMA.sum(axis=1))[:, None]).sum(
@@ -246,16 +246,7 @@ def  M_step_Vectorization(images, captions, k, tol=1e-3, tol_estep=1e-3, max_ite
         c = (sum(g / h)) / (1 / z + sum(1 / h))
         alpha = alpha0 - (g - c) / h
 
-        # # update mu and sigma
-        # Mean1 = np.zeros((k,dim))
-        # for d in range(D):
-        #     # print((PHI[d].T @ images[d]))
-        #     # print((1 / matlib.repmat(np.mat(Nk).T, 1, dim)))
-        #     # print((1 / matlib.repmat(np.mat(Nk).T, 1, dim)).shape)
-        #     Mean1 += np.multiply((PHI[d].T @ images[d]), (1 / matlib.repmat(np.mat(Nk).T, 1, dim)))
-        #     # cov +=
-
-
+        #update mean and covariance
         Mean = np.mat(np.zeros((k, dim)))
         Covariances = [np.zeros((dim, dim))] * k
         for d in range(D):
@@ -264,6 +255,7 @@ def  M_step_Vectorization(images, captions, k, tol=1e-3, tol_estep=1e-3, max_ite
                 cov_k = (images[d] - Mean[i]).T * np.multiply((images[d] - Mean[i]), np.mat(PHI[d][:, i]).T) / Nk[i]
                 Covariances[i] += cov_k
 
+        # print(Mean)
         alpha_dis = np.mean((alpha - alpha0) ** 2)
         beta_dis = np.mean((BETA - BETA0) ** 2)
         alpha0 = alpha
@@ -273,14 +265,7 @@ def  M_step_Vectorization(images, captions, k, tol=1e-3, tol_estep=1e-3, max_ite
         if ((alpha_dis <= tol) and (beta_dis <= tol)):
             break
         print(iteration)
-
-    # Mean = np.zeros((k, dim))
-    # for d in range(D):
-    #     for i in range(k):
-    #         Mean[i, :] += np.sum(np.multiply(Y, PHI[d][:, i]), axis=0) / Nk
-    #         cov_k = (Y - Mean[k]).T * np.multiply((Y - PHI[d][i]), gamma[:, i]) / Nk
-    #         cov.append(cov_k)
-    return alpha, BETA, Mean
+    return alpha, BETA, Mean, PHI, LAMBDA
 
 
 def mmse(alpha, BETA, Mean, alpha_est, BETA_est, Mean_est):
@@ -405,13 +390,13 @@ print(a)
 # print(Mean)
 # print()
 
-
-images, captions, alpha, BETA, Mean, Covariances = simulation_data(D=10, k=2, V=5, xi=3)
-alpha_est, beta_est, Mean_est = M_step_Vectorization(images=images, captions=captions,k=2,tol=1e-3,tol_estep=1e-3,max_iter=100,initial_alpha_shape=100,initial_alpha_scale=0.01)
-# Mean_est = np.random.normal(0, 1, (10, 5))
-print(BETA)
-print(beta_est)
-
+#************
+# images, captions, alpha, BETA, Mean, Covariances = simulation_data(D=10, k=2, V=5, xi=3)
+# alpha_est, beta_est, Mean_est = M_step_Vectorization(images=images, captions=captions,k=2,tol=1e-3,tol_estep=1e-3,max_iter=100,initial_alpha_shape=100,initial_alpha_scale=0.01)
+# # Mean_est = np.random.normal(0, 1, (10, 5))
+# print(BETA)
+# print(beta_est)
+#************
 
 
 # alpha_mse, beta_mse, Mean_mse = mmse(alpha, BETA, Mean, alpha_est, beta_est,  Mean_est)

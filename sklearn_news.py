@@ -161,39 +161,18 @@ d_sub = processed_docs[:500]
 tf = {id: tz.frequencies(doc) for id, doc in enumerate(d_sub)}
 df = pd.DataFrame(tf).fillna(0)
 words = df.index
-print(words)
-#
-#
-#
-# ds = df.values.T
-# ds = ds.astype(int)
-# print(ds[0])
 
 
 
-# def DataTrans(x):
-#     """Turn the data into the desired structure"""
-#
-#     N_d = np.sum(x)
-#     V = len(x)
-#
-#     row = 0
-#
-#     doc = np.zeros((N_d, V))
-#     for i in range(V):
-#         if x[i] == 0:
-#             pass
-#         else:
-#             for j in range(x[i]):
-#                 doc[row, i] = 1
-#                 row += 1
-#
-#     return doc
+ds = df.values.T
+ds = ds.astype(int)
+
+
 
 def DataTrans(x):
     """Turn the data into the desired structure"""
 
-    N_d = np.count_nonzero(x)
+    N_d = np.sum(x)
     V = len(x)
 
     row = 0
@@ -203,70 +182,76 @@ def DataTrans(x):
         if x[i] == 0:
             pass
         else:
-            doc[row, i] = x[i]
-            row += 1
+            for j in range(x[i]):
+                doc[row, i] = 1
+                row += 1
 
     return doc
 
-def DataTrans2(x, length):
-    """Turn the data into the desired structure"""
-
-    N_d = len(x)
-    V = length
-
-    row = 0
-
-    doc = np.zeros((N_d, V))
-    for i in range(len(x)):
-        doc[i, x[i][0]] = x[i][1]
-        row += 1
-
-    return doc
-
-dictionary = gensim.corpora.Dictionary(d_sub)
-dicLength = dictionary.__len__()
-dictionary.filter_extremes(no_below=15, no_above=0.1, keep_n= 100000)
-bow_corpus = [dictionary.doc2bow(doc) for doc in d_sub]
-print(bow_corpus[0])
-
+# def DataTrans(x):
+#     """Turn the data into the desired structure"""
+#
+#     N_d = np.count_nonzero(x)
+#     V = len(x)
+#
+#     row = 0
+#
+#     doc = np.zeros((N_d, V))
+#     for i in range(V):
+#         if x[i] == 0:
+#             pass
+#         else:
+#             doc[row, i] = x[i]
+#             row += 1
+#
+#     return doc
 
 
 print("transforming data...")
-# docs = list(map(DataTrans2, ds))
-docs = [DataTrans2(d, dicLength) for d in bow_corpus]
-
-print(docs[0])
+# docs = list(map(DataTrans, ds))
+dictionary = gensim.corpora.Dictionary(d_sub)
+dictionary.filter_extremes(no_below=15, no_above=0.1, keep_n= 100000)
+bow_corpus = [dictionary.doc2bow(doc) for doc in d_sub]
+print(bow_corpus[20])
 
 
 
 print("start training")
-a, B = M_step_Realdata(docs=docs, k=8, tol=1e-3, tol_estep=1e-3, max_iter=100, initial_alpha_shape=100,
-                       initial_alpha_scale=0.01)
+# a, B = M_step_Realdata(docs=docs, k=8, tol=1e-3, tol_estep=1e-3, max_iter=100, initial_alpha_shape=100,
+#                        initial_alpha_scale=0.01)
+lda_model =  gensim.models.LdaMulticore(bow_corpus,
+                                   num_topics = 8,
+                                   id2word = dictionary,
+                                   passes = 10,
+                                   workers = 2)
+
+for idx, topic in lda_model.print_topics(-1):
+    print("Topic: {} \nWords: {}".format(idx, topic ))
+    print("\n")
 
 
 def find_index(x):
     """find the index of the largest 10 values in a list"""
 
     x = x.tolist()
-    max_values = heapq.nlargest(10, x)
-    index = [0] * 10
-    for i in range(10):
+    max_values = heapq.nlargest(50, x)
+    index = [0] * 50
+    for i in range(50):
         index[i] = x.index(max_values[i])
 
     return index
 
 
 
-rep_words_index = list(map(find_index, B))
-print(rep_words_index[0])
-print([dictionary[i] for i in rep_words_index[0]])
-print([dictionary[i] for i in rep_words_index[1]])
-print([dictionary[i] for i in rep_words_index[2]])
-print([dictionary[i] for i in rep_words_index[3]])
-print([dictionary[i] for i in rep_words_index[4]])
-print([dictionary[i] for i in rep_words_index[5]])
-print([dictionary[i] for i in rep_words_index[6]])
-print([dictionary[i] for i in rep_words_index[7]])
-print([dictionary[i] for i in rep_words_index[8]])
-print([dictionary[i] for i in rep_words_index[9]])
+# rep_words_index = list(map(find_index, B))
 
+# print(words[rep_words_index[0]])
+# print(words[rep_words_index[1]])
+# print(words[rep_words_index[2]])
+# print(words[rep_words_index[3]])
+# print(words[rep_words_index[4]])
+# print(words[rep_words_index[5]])
+# print(words[rep_words_index[6]])
+# print(words[rep_words_index[7]])
+# print(words[rep_words_index[8]])
+# print(words[rep_words_index[9]])
