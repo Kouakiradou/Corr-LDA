@@ -64,8 +64,9 @@ CYAN = np.array([0.1, 0.8, 0.9])
 ORANGE = np.array([0.9, 0.6, 0.1])
 WHITE = np.array([0.9, 0.9, 0.9])
 BLACK = np.array([0.1, 0.1, 0.1])
+YELLOW = np.array([0.9, 0.9, 0.1])
 
 color_std = np.array([0.04, 0.04, 0.04])
 
-color = [RED, GREEN, BLUE, CYAN, ORANGE, BLACK, WHITE]
-color_word = ["RED", "GREEN", "BLUE", "CYAN", "ORANGE", "BLACK", "WHITE"]
+color = [RED, GREEN, BLUE, CYAN, ORANGE, BLACK, WHITE, YELLOW]
+color_word = ["RED", "GREEN", "BLUE", "CYAN", "ORANGE", "BLACK", "WHITE", "YELLOW"]
