@@ -1,4 +1,4 @@
-from data_generation import make_synthetic
+from synthetic_data.data_generation import make_synthetic
 from data_processing import image_process, caption_process
 import imageio
 import heapq

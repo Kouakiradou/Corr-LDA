@@ -1,6 +1,4 @@
-import imageio
-import numpy as np
-from colours import *
+from synthetic_data.colours import *
 from corr_LDA import M_step_Vectorization
 
 

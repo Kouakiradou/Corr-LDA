@@ -1,8 +1,8 @@
 import numpy as np
-import colours
-from colours import color_word, color_std, color
-import imageio
-import matplotlib.pyplot as plt
+from synthetic_data import colours
+from synthetic_data.colours import color_word, color_std
+
+
 # %matplotlib inline
 
 def make_synthetic(D = 10):
