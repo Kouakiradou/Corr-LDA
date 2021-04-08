@@ -1,5 +1,5 @@
 from synthetic_data.data_generation import make_synthetic
-from data_processing import image_process, caption_process
+from synthetic_data.data_processing import image_process, caption_process
 import imageio
 import heapq
 from skimage.util import img_as_float
