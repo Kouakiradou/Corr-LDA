@@ -22,7 +22,8 @@ class Processer:
     def process(self):
         captions = []
         images = []
-        for idx in range(51,52):
+        for idx in range(len(self.imgs)):
+            print(idx)
             img = self.imgs[idx]
             img_id = self.img_ids[idx]
 

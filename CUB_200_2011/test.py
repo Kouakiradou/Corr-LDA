@@ -12,6 +12,11 @@ images, captions = processor.process()
 # print(images, [caption.shape for caption in captions])
 np.savez(processed_data_path, images=images, captions=captions)
 
-# data = np.load(processed_data_path, allow_pickle=True)
-# print([image.shape for image in images])
-# print([caption.shape for caption in captions])
+data = np.load(processed_data_path, allow_pickle=True)
+new_img = data['images']
+new_cap = data['captions']
+print([image.shape for image in new_img])
+print([caption.shape for caption in new_cap])
+print(type(new_img))
+print(type(new_cap))
+print(type(new_img[0]))

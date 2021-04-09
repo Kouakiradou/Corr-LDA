@@ -15,7 +15,7 @@ from skimage.segmentation import mark_boundaries
 from skimage.util import img_as_float, img_as_ubyte
 
 img = img_as_float(io.imread("/Users/kouakiradou/Machine Learning/Final-Year-project/Corr-LDA/images/0.png"))
-segments_slic = slic(img, n_segments=30, compactness=13, sigma=1,
+segments_slic = slic(img, n_segments=20, compactness=10, sigma=1,
                      start_label=1)
 print(segments_slic)
 c = np.unique(segments_slic)

@@ -278,7 +278,7 @@ def  M_step_Vectorization(images, captions, k, tol=1e-3, tol_estep=1e-3, max_ite
         if ((alpha_dis <= tol) and (beta_dis <= tol)):
             break
         print(iteration)
-    return alpha, BETA, Mean, PHI, LAMBDA
+    return alpha, BETA, Mean, Covariances, PHI, LAMBDA, GAMMA
 
 
 def mmse(alpha, BETA, Mean, alpha_est, BETA_est, Mean_est):
