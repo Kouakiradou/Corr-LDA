@@ -22,7 +22,7 @@ class Processer:
     def process(self):
         captions = []
         images = []
-        for idx in range(3):
+        for idx in range(51,52):
             img = self.imgs[idx]
             img_id = self.img_ids[idx]
 
@@ -50,13 +50,14 @@ class Processer:
     def img_feature_extraction(self, img):
         # Change CHW to HWC
         HWC_img = img_as_float(img.permute(1, 2, 0))
-        segments_slic = slic(HWC_img, n_segments=10, compactness=10, sigma=1, start_label=1)
-        N = len(np.unique(segments_slic))
-        image = np.zeros((N, 3))
-
+        segments_slic = slic(HWC_img, n_segments=20, compactness=10, sigma=1, start_label=1)
+        unique_lables = np.unique(segments_slic)
+        if 0 in unique_lables:
+            unique_lables = np.delete(unique_lables, 0)
+        N = len(unique_lables)
+        image = np.zeros((N, 19))
         regions = measure.regionprops(segments_slic, intensity_image=HWC_img)
-
-        for (i, segVal) in enumerate(np.unique(segments_slic)):
+        for (i, segVal) in enumerate(unique_lables):
             # convert image to grayscale
             ubyte_img = img_as_ubyte(HWC_img)
             ubyte_img[ubyte_img == 0] = 1
