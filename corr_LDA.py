@@ -5,6 +5,7 @@ import numpy as np
 from numpy import matlib
 from scipy.special import digamma, polygamma
 from scipy.stats import multivariate_normal
+from sklearn.datasets import make_spd_matrix
 import matplotlib.pyplot as plt
 import matplotlib
 matplotlib.use('TkAgg')
@@ -130,7 +131,8 @@ def E_step_Vectorization(alpha, BETA, Mean, Covariances, image, caption, Phi0, g
         #     print(dia_gamma)
         # log_likelihood = np.exp(Lambdaa.T @ np.log(caption @ BETA.T))
         Phi = multivari_pdf * np.exp(digamma(gamma) - digamma(sum(gamma))) * np.exp(Lambdaa.T @ np.log(caption @ BETA.T)) #please double check
-
+        # dia_gamma = np.exp(digamma(gamma) - digamma(sum(gamma)))
+        # expppp = np.exp(Lambdaa.T @ np.log(caption @ BETA.T))
         # exp = np.exp(Lambdaa.T @ np.log(caption @ BETA.T))
         # diag = np.exp(digamma(gamma) - digamma(sum(gamma)))
         # print("-----Phi-------")
@@ -223,8 +225,10 @@ def  M_step_Vectorization(images, captions, k, tol=1e-3, tol_estep=1e-3, max_ite
 
     Covariances0 = []
     for i in range(k):
-        temp_mat = np.random.rand(dim, dim)
-        Covariances0.append(temp_mat @ temp_mat.T)
+        # temp_mat = np.random.rand(dim, dim)
+        # Covariances0.append(temp_mat @ temp_mat.T)
+        # Covariances0.append(make_spd_matrix(dim))
+        Covariances0.append(np.eye(dim))
 
     PHI = [np.ones((N[d], k)) / k for d in range(D)]
     LAMBDA = [np.ones((M[d], N[d])) / N[d] for d in range(D)]
@@ -261,14 +265,15 @@ def  M_step_Vectorization(images, captions, k, tol=1e-3, tol_estep=1e-3, max_ite
 
         #update mean and covariance
         Mean = np.mat(np.zeros((k, dim)))
-        Covariances = [np.zeros((dim, dim))] * k
+        # Covariances = [np.zeros((dim, dim))] * k # that is a fucking big error, remember this create k shallow copy of matrix
+        Covariances = [np.zeros((dim, dim)) for _ in range(k)]
         for d in range(D):
             for i in range(k):
                 Mean[i, :] += np.sum(np.multiply(images[d], np.mat(PHI[d][:, i]).T), axis=0) / Nk[i]
                 cov_k = (images[d] - Mean[i]).T * np.multiply((images[d] - Mean[i]), np.mat(PHI[d][:, i]).T) / Nk[i]
                 Covariances[i] += cov_k
-
-        # print(Mean)
+        for i in range(k):
+            Covariances[i] += np.identity(dim) * 0.001
         alpha_dis = np.mean((alpha - alpha0) ** 2)
         beta_dis = np.mean((BETA - BETA0) ** 2)
         alpha0 = alpha

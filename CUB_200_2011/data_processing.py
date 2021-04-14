@@ -19,10 +19,12 @@ class Processer:
         self.num_captions_per_image = metadata['num_captions_per_image']
         self.imgs = torch.load(data_path)
 
-    def process(self):
+    def process(self, size=None):
         captions = []
         images = []
-        for idx in range(len(self.imgs)):
+        if size is None:
+            size = len(self.imgs)
+        for idx in range(size):
             print(idx)
             img = self.imgs[idx]
             img_id = self.img_ids[idx]

@@ -5,6 +5,8 @@ import heapq
 from skimage.util import img_as_float
 from skimage import io
 from corr_LDA import M_step_Vectorization
+from sklearn import preprocessing
+import numpy as np
 
 print("generating synthetic data...")
 origin_images, origin_captions = make_synthetic(500)  # origin_captions be like ['Green','BLUE', 'YELLOW']
@@ -27,16 +29,27 @@ images = image_process(image_from_file)
 captions, dictionary = caption_process(origin_captions)
 print(dictionary.token2id)
 
+print("scaling...")
+scalar = preprocessing.MinMaxScaler()
+scalar.fit(np.vstack(images))
+new_image = [scalar.transform(image) for image in images]
+print(images[0], images[1])
+print(new_image[0],new_image[1])
+
 print("training...")
-alpha_est, beta_est, Mean_est, phi, lambdaa = M_step_Vectorization(images=images, captions=captions,k=2,tol=1e-3,tol_estep=1e-3,max_iter=100,initial_alpha_shape=100,initial_alpha_scale=0.01)
+alpha, BETA, Mean, Covariances, PHI, LAMBDA, GAMMA = M_step_Vectorization(images=new_image, captions=captions,k=2,tol=1e-3,tol_estep=1e-3,max_iter=100,initial_alpha_shape=100,initial_alpha_scale=0.01)
 print("beta matrix------------")
-print(beta_est)
+print(BETA)
 # print("phi--------------------")
-# print(phi)
+# print(PHI)
 # print("lambda-----------------")
-# print(lambdaa)
+# print(LAMBDA)
+# print("gamma-----------------")
+# print(GAMMA)
 print("mean-----------------")
-print(Mean_est)
+print(Mean)
+# print("variance------------")
+# print(Covariances)
 
 
 def find_index(x):
@@ -50,7 +63,7 @@ def find_index(x):
 
     return index
 
-rep_words_index = list(map(find_index, beta_est))
+rep_words_index = list(map(find_index, BETA))
 print([dictionary[i] for i in rep_words_index[0]])
 print([dictionary[i] for i in rep_words_index[1]])
 
