@@ -10,7 +10,7 @@ processed_data_path = '/Users/kouakiradou/Machine Learning/Final-Year-project/Co
 # captionsPath = '/Users/kouakiradou/Machine Learning/Final-Year-project/Corr-LDA/CUB_200_2011/preprocessed_data/'
 
 processor = Processer(imgs_path, metadata_path)
-images, captions = processor.process(size=3)
+images, captions = processor.process(size=10)
 #
 # # w = np.empty((0,19))
 # # c = np.ones((1,19))

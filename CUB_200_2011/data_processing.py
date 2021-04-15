@@ -59,6 +59,7 @@ class Processer:
             unique_lables = np.delete(unique_lables, 0)
         N = len(unique_lables)
         image = np.zeros((N, 19))
+        # image = np.zeros((N, 6))
         regions = measure.regionprops(segments_slic, intensity_image=HWC_img)
         for (i, segVal) in enumerate(unique_lables):
             # convert image to grayscale
@@ -85,7 +86,7 @@ class Processer:
             area = regions[i].area
 
             image[i] = np.hstack((mean_intensity,centroid, area, ht_mean))
-
+            # image[i] = np.hstack((mean_intensity, centroid, area))
         return image
 
     def caption_to_one_hot(self, caption):

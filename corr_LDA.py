@@ -106,7 +106,8 @@ def E_step_Vectorization(alpha, BETA, Mean, Covariances, image, caption, Phi0, g
     for iteration in range(max_iter):
         ##update gamma
         gamma = alpha + Phi.sum(axis=0)
-
+        # if not np.all(gamma >= 0):
+        #     print(gamma)
         multivari_pdf = np.zeros((image.shape[0], Mean.shape[0]))
         for k in range(Mean.shape[0]):
             # print(np.diag(Covariance[k,]))
@@ -248,7 +249,7 @@ def  M_step_Vectorization(images, captions, k, tol=1e-3, tol_estep=1e-3, max_ite
     for iteration in range(max_iter):
         # update PHI,GAMMA,BETA
         Nk = np.zeros(k)
-        BETA = np.zeros((k, V))
+        BETA = np.zeros((k, V)) + 1e-10
         for d in range(D):  #documents
             PHI[d], GAMMA[d,], LAMBDA[d] = E_step_Vectorization(alpha0, BETA0, Mean0, Covariances0, images[d], captions[d], PHI[d], GAMMA[d,], LAMBDA[d], max_iter, tol_estep)
             BETA += (LAMBDA[d] @ PHI[d]).T @ captions[d]
@@ -262,6 +263,7 @@ def  M_step_Vectorization(images, captions, k, tol=1e-3, tol_estep=1e-3, max_ite
             axis=0)
         c = (sum(g / h)) / (1 / z + sum(1 / h))
         alpha = alpha0 - (g - c) / h
+        alpha[alpha < 0.01] = 0.01
 
         #update mean and covariance
         Mean = np.mat(np.zeros((k, dim)))
@@ -276,11 +278,13 @@ def  M_step_Vectorization(images, captions, k, tol=1e-3, tol_estep=1e-3, max_ite
             Covariances[i] += np.identity(dim) * 0.001
         alpha_dis = np.mean((alpha - alpha0) ** 2)
         beta_dis = np.mean((BETA - BETA0) ** 2)
+        mean_dis = np.mean((np.asarray(Mean) - Mean0) ** 2)
+        cov_dis = np.mean((np.asarray(Covariances)- np.asarray(Covariances0)) ** 2)
         alpha0 = alpha
         BETA0 = BETA
         Mean0 = np.asarray(Mean)
         Covariances0 = Covariances
-        if ((alpha_dis <= tol) and (beta_dis <= tol)):
+        if ((alpha_dis <= tol) and (beta_dis <= tol) and (mean_dis <= tol) and (cov_dis <= tol)): # check all the parameter
             break
         print(iteration)
     return alpha, BETA, Mean, Covariances, PHI, LAMBDA, GAMMA
