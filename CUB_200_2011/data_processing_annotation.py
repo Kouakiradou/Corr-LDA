@@ -10,19 +10,22 @@ import mahotas.features.texture as texture
 # metadata_path = 'dataset/archive/metadata.pth'
 
 
-class Processer:
+class AnnotationProcesser:
     def __init__(self, data_path, meta_path):
         metadata = torch.load(meta_path)
-        self.img_ids = metadata['train_val_img_ids']
-        # self.img_ids = metadata['test_img_ids']
+        # self.img_ids = metadata['train_val_img_ids']
+        self.img_ids = metadata['test_img_ids']
         self.img_id_to_encoded_caps = metadata['img_id_to_encoded_caps']
         self.num_words = metadata['num_words']
+        self.dict = metadata['word_id_to_word']
         self.num_captions_per_image = metadata['num_captions_per_image']
         self.imgs = torch.load(data_path)
 
     def process(self, size=None):
         captions = []
         images = []
+        actual_img = []
+        caption_ground_truth = []
         if size is None:
             size = len(self.imgs)
         for idx in range(size):
@@ -30,6 +33,8 @@ class Processer:
             img = self.imgs[idx]
             img_id = self.img_ids[idx]
 
+            HWC_img = img_as_float(img.permute(1, 2, 0))
+            actual_img.append(HWC_img)
             # processing image to properties of segmentation
             images.append(self.img_feature_extraction(img))
 
@@ -37,8 +42,9 @@ class Processer:
             encoded_caps = self.img_id_to_encoded_caps[img_id]
             cap_idx = torch.randint(low=0, high=10, size=(1,)).item()
             encoded_cap = encoded_caps[cap_idx]
+            caption_ground_truth.append([self.dict[cap] for cap in encoded_cap])
             captions.append(self.caption_to_one_hot(encoded_cap))
-        return images, captions
+        return actual_img, images, captions, caption_ground_truth
 
     def img_segmentation(self, img):
         # Change CHW to HWC

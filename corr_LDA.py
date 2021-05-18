@@ -180,8 +180,8 @@ def E_step_Vectorization(alpha, BETA, Mean, Covariances, image, caption, Phi0, g
         # if phi_delta <= tol:
         #     print("phi tol")
         #
-        # if gamma_delta <= tol:
-        #     print("gamma tol")
+        if gamma_delta <= tol:
+            print(gamma_delta)
         #
         # if Lambdaa_delta <= tol:
         #     print("lambda tol")

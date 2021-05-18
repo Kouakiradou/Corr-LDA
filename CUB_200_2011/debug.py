@@ -19,5 +19,6 @@ from scipy.stats import multivariate_normal
 
 mat = np.array([[1,1,1],[2,2,2],[3,3,3]])
 mat2 = np.array([[2,2,2],[3,3,3],[4,4,4]])
-list = np.asarray([mat,mat2])
-print(mat ** 2)
+print(mat)
+print(np.sum(mat, axis=0))
+# print(mat ** 2)

@@ -14,8 +14,8 @@ from skimage.segmentation import felzenszwalb, slic, quickshift, watershed
 from skimage.segmentation import mark_boundaries
 from skimage.util import img_as_float, img_as_ubyte
 
-img = img_as_float(io.imread("/Users/kouakiradou/Machine Learning/Final-Year-project/Corr-LDA/images/0.png"))
-segments_slic = slic(img, n_segments=20, compactness=10, sigma=1,
+img = img_as_float(io.imread("/Users/kouakiradou/Machine Learning/Final-Year-project/Corr-LDA/CUB_200_2011/test_image/5.png"))
+segments_slic = slic(img, n_segments=30, compactness=10, sigma=1,
                      start_label=1)
 print(segments_slic)
 c = np.unique(segments_slic)
@@ -37,7 +37,7 @@ for (i, segVal) in enumerate(c):
 	features = texture.haralick(gray, ignore_zeros=True)
 	ht_mean = features.mean(axis=0)
 	a = np.hstack((regions[i].mean_intensity,regions[i].centroid, ht_mean))
-	# print(regions[i].mean_intensity)
+	print(regions[i].mean_intensity)
 	# print(regions[i].centroid)
 	# print(ht_mean)
 	# print(a.shape)

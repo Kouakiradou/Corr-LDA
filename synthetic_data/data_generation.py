@@ -1,3 +1,4 @@
+import imageio
 import numpy as np
 from synthetic_data import colours
 from synthetic_data.colours import color_word, color_std
@@ -41,11 +42,11 @@ def make_synthetic(D = 10):
         captions.append(caption)
     return images, captions
 
-# images, captions = make_synthetic(100)
-# index = 0
-# for image in images:
-#     path = "images/" + str(index) + ".png"
-#     imageio.imwrite(path, image)
-#     index = index + 1
-# for i in captions:
-#     print(i)
+images, captions = make_synthetic(20)
+index = 0
+for image in images:
+    path = "images/" + str(index) + ".png"
+    imageio.imwrite(path, image)
+    index = index + 1
+for i in captions:
+    print(i)
